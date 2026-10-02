@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock Bank App (Application Under Test)</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Mock Mobile Bank</h1>
+<p>Demo app built only for testing. No real money or real bank. Version: <b id="ver"></b></p></header>
+<nav><a href="index.html">QA dashboard</a><a href="app.html?v=1.0">Open v1.0 (has bugs)</a><a href="app.html?v=1.1">Open v1.1 (fixed)</a><a href="api.html">API tests</a></nav>
+<main style="max-width:480px">
+
+<section id="login" class="card"><h2>Log in</h2>
+<label for="pin">PIN (demo PIN is 1234)</label><input id="pin" type="password" inputmode="numeric">
+<button onclick="login()">Log in</button> <p id="loginMsg" class="err"></p></section>
+
+<div id="home" hidden>
+<section class="card"><p>Available balance</p><h2 id="bal"></h2>
+<button class="alt" onclick="show('send')">Send money</button>
+<button class="alt" onclick="show('air')">Buy airtime</button>
+<button class="alt" onclick="show('hist')">History</button></section>
+
+<section id="send" class="card" hidden><h2>Send money</h2>
+<label for="to">Recipient phone</label><input id="to" inputmode="tel">
+<label for="amt">Amount (KES)</label><input id="amt" inputmode="decimal">
+<button onclick="send()">Send</button> <button class="alt" onclick="show('home')">Back</button>
+<p id="sendMsg"></p></section>
+
+<section id="air" class="card" hidden><h2>Buy airtime</h2>
+<label for="net">Network</label><select id="net"><option>Network A</option><option>Network B</option></select>
+<label for="aamt">Amount (KES)</label><input id="aamt" inputmode="decimal">
+<button onclick="airtime()">Buy</button> <button class="alt" onclick="show('home')">Back</button>
+<p id="airMsg"></p></section>
+
+<section id="hist" class="card" hidden><h2>Transaction history</h2>
+<div class="wrap"><table><thead><tr><th>Type</th><th>Detail</th><th>KES</th></tr></thead><tbody id="rows"></tbody></table></div>
+<button class="alt" onclick="show('home')">Back</button></section>
+</div>
+</main>
+<script>
+// Version switch: app.html?v=1.0 has the bugs, ?v=1.1 has them fixed.
+const FIXED = new URLSearchParams(location.search).get('v') === '1.1';
+document.getElementById('ver').textContent = FIXED ? '1.1 (fixed)' : '1.0 (with defects)';
+let balance = 50000, tx = [];
+const $ = id => document.getElementById(id);
+function show(id){ ['home','send','air','hist'].forEach(s => { if(s!=='home') $(s).hidden = s!==id; });
+  $('home').hidden = false; if(id==='home'){['send','air','hist'].forEach(s=>$(s).hidden=true);} render(); }
+function render(){ $('bal').textContent = 'KES ' + balance.toLocaleString();
+  const list = FIXED ? [...tx].reverse() : tx;           // DEF-04: v1.0 shows oldest first
+  $('rows').innerHTML = list.length ? list.map(t=>`<tr><td>${t.type}</td><td>${t.d}</td><td>${t.a}</td></tr>`).join('') : '<tr><td colspan="3">No transactions yet.</td></tr>'; }
+function login(){ if($('pin').value==='1234'){ $('login').hidden=true; show('home'); } else $('loginMsg').textContent='Incorrect PIN. Try again.'; }
+function send(){ const a = parseFloat($('amt').value), m = $('sendMsg'); m.className='err';
+  if(!$('to').value){ m.textContent='Enter a recipient phone number.'; return; }
+  if(isNaN(a)){ m.textContent='Enter a valid amount.'; return; }
+  if(FIXED && a<=0){ m.textContent='Amount must be greater than zero.'; return; } // DEF-01: v1.0 accepts negatives
+  if(a>balance){ m.textContent = FIXED ? 'Insufficient funds. Your balance is KES '+balance+'.' : 'Error 5003'; return; } // DEF-03
+  balance -= a; tx.push({type:'Transfer',d:$('to').value,a:-a}); m.className='ok'; m.textContent='Sent KES '+a+'.'; render(); }
+function airtime(){ const a = parseFloat($('aamt').value), m = $('airMsg'); m.className='err';
+  if(isNaN(a) || a<=0){ m.textContent='Enter a valid amount.'; return; }
+  if(a>balance){ m.textContent='Insufficient funds.'; return; }
+  if(FIXED) balance -= a;                                  // DEF-02: v1.0 forgets to deduct balance
+  tx.push({type:'Airtime',d:$('net').value,a:-a}); m.className='ok'; m.textContent='Airtime bought: KES '+a+'.'; render(); }
+</script></body></html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA Case Study: Mobile and Channel Testing</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>QA case study: testing a mobile banking channel</h1>
+<p>I tested a demo mobile banking web app and a public API, logged the defects, re-tested the fixes and wrote a release sign-off. Replace this line with your name and a one-line summary.</p></header>
+<nav><a href="#cases">Test cases</a><a href="#defects">Defects</a><a href="#compat">Devices</a><a href="#regression">Regression</a><a href="#signoff">Sign-off</a><a href="#improve">Improvements</a><a href="app.html?v=1.0">App v1.0</a><a href="app.html?v=1.1">App v1.1</a><a href="api.html">API tests</a></nav>
+<main>
+<section><div class="stats card" id="stats"></div></section>
+
+<section id="cases"><h2>Test cases (functional, error and navigation)</h2>
+<p>Cycle 1 ran on v1.0. Cycle 2 re-ran every test on v1.1 (regression plus defect retest).</p>
+<div class="wrap"><table><thead><tr><th>ID</th><th>Scenario</th><th>Test data</th><th>Expected result</th><th>v1.0</th><th>v1.1</th><th>Defect</th></tr></thead><tbody id="tc"></tbody></table></div></section>
+
+<section id="defects"><h2>Defect log</h2>
+<p>Severity is how badly it hurts the customer or the bank. Priority is how soon it must be fixed.</p>
+<div class="wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Steps to reproduce</th><th>Actual vs expected</th><th>Severity</th><th>Priority</th><th>Status</th></tr></thead><tbody id="df"></tbody></table></div></section>
+
+<section id="compat"><h2>Device, OS and browser matrix</h2>
+<p>Edit this table with the devices you really tested on. Only record results you actually saw.</p>
+<div class="wrap"><table><thead><tr><th>Device / OS</th><th>Browser</th><th>Screen</th><th>Login</th><th>Send money</th><th>Airtime</th><th>Layout</th></tr></thead><tbody id="cm"></tbody></table></div></section>
+
+<section id="regression"><h2>Regression and API results</h2>
+<div class="card"><p><b>Regression scope for v1.1:</b> all 9 test cases, because the fixes touched balance, transfer and history logic, which every journey depends on.</p>
+<p><b>API suite:</b> 5 checks on <a href="api.html">the API page</a>: status codes, required fields, a not-found case and a create (POST) case.</p></div></section>
+
+<section id="signoff"><h2>Release sign-off: v1.1</h2>
+<div class="card"><p><b>Recommendation: Approved for release.</b></p>
+<p>All 4 defects are fixed and verified. 9 of 9 test cases pass on v1.1. No open critical or high defects. Evidence: this dashboard, defect log and screenshots in the <code>evidence</code> folder.</p>
+<p>Residual risk: the app is a demo with no real backend, so performance, security and real device-network behaviour are not covered.</p></div></section>
+
+<section id="improve"><h2>Quality improvement</h2>
+<div class="card"><ul>
+<li><b>Pattern:</b> 2 of 4 defects were calculation or balance errors. Add a calculation check to every money-moving test case.</li>
+<li><b>Pattern:</b> error messages were unclear. Add an error-message review to the test checklist.</li>
+<li><b>Coverage gap:</b> no tests for session timeout, duplicate submissions or slow networks. Add these next.</li>
+<li><b>Automation idea:</b> the regression suite is repeatable, so it is a good candidate for automation (for example Playwright).</li>
+</ul></div></section>
+</main>
+<script>
+// EDIT THESE LISTS to change what the dashboard shows. Everything else updates by itself.
+const cases=[
+['TC01','Log in with valid PIN','PIN 1234','Home screen with balance','Pass','Pass',''],
+['TC02','Log in with wrong PIN','PIN 0000','Clear error, no access','Pass','Pass',''],
+['TC03','Send valid amount','0700000000, 1000','Balance drops by 1000, history updated','Pass','Pass',''],
+['TC04','Send negative amount','0700000000, -500','Rejected with clear message','Fail','Pass','DEF-01'],
+['TC05','Send more than balance','Amount 99999','Rejected with clear message','Fail','Pass','DEF-03'],
+['TC06','Buy airtime','Network A, 100','Balance drops by 100','Fail','Pass','DEF-02'],
+['TC07','Transaction history order','Two transactions','Newest transaction at top','Fail','Pass','DEF-04'],
+['TC08','Send with empty recipient','Blank phone, 100','Prompt to enter recipient','Pass','Pass',''],
+['TC09','Airtime with insufficient funds','Amount 99999','Rejected with message','Pass','Pass','']];
+const defects=[
+['DEF-01','Transfer accepts negative amount','1. Log in 2. Send money 3. Enter -500','Balance increased. Expected: rejection','High','High','Closed'],
+['DEF-02','Balance not reduced after airtime purchase','1. Buy airtime 100 2. Check balance','Balance unchanged. Expected: reduced by 100','High','High','Closed'],
+['DEF-03','Unclear error on insufficient funds','1. Send 99999','Shows "Error 5003". Expected: plain message with balance','Medium','Medium','Closed'],
+['DEF-04','History shows oldest first','1. Make two transactions 2. Open history','Oldest at top. Expected: newest at top','Low','Low','Closed']];
+const compat=[
+['Android phone','Chrome','Small','Pass','Pass','Pass','Pass'],
+['iPhone','Safari','Small','Pass','Pass','Pass','Pass'],
+['Windows laptop','Chrome','Large','Pass','Pass','Pass','Pass'],
+['Windows laptop','Firefox','Large','Pass','Pass','Pass','Pass'],
+['Android tablet','Chrome','Medium','Pass','Pass','Pass','Pass']];
+const tag=v=>v?`<span class="tag ${v}">${v}</span>`:'-';
+const rows=(a,i)=>a.map(r=>'<tr>'+r.map((c,j)=>`<td>${i.includes(j)?tag(c):c}</td>`).join('')+'</tr>').join('');
+document.getElementById('tc').innerHTML=rows(cases,[4,5]);
+document.getElementById('df').innerHTML=rows(defects,[4,5,6]);
+document.getElementById('cm').innerHTML=rows(compat,[3,4,5,6]);
+const f1=cases.filter(c=>c[4]==='Fail').length, p2=cases.filter(c=>c[5]==='Pass').length;
+document.getElementById('stats').innerHTML=[[cases.length,'test cases'],[f1,'failed in v1.0'],[defects.length,'defects logged'],[defects.filter(d=>d[6]==='Closed').length,'defects closed'],[Math.round(p2/cases.length*100)+'%','pass rate in v1.1']].map(s=>`<div><b>${s[0]}</b>${s[1]}</div>`).join('');
+</script></body></html>

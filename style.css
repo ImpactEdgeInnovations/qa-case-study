@@ -1,0 +1,28 @@
+:root{--ink:#17302f;--bg:#f4f7f6;--card:#fff;--teal:#0f5257;--line:#d5e0de;--pass:#1e7a46;--fail:#b3261e;--warn:#b86e00;--muted:#5d716f}
+@media(prefers-color-scheme:dark){:root{--ink:#e4efed;--bg:#0f1b1b;--card:#172827;--teal:#6cc3c0;--line:#2a4140;--muted:#9bb2af}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 Georgia,"Times New Roman",serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3,nav,button,th,.tag,label{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--teal);color:#fff;padding:28px 20px}
+@media(prefers-color-scheme:dark){header{color:#0f1b1b}}
+header h1{margin:0 0 6px;font-size:1.7rem}header p{margin:0;max-width:60ch}
+nav{display:flex;gap:18px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav a{color:var(--teal);font-weight:600;text-decoration:none}nav a:hover,a:focus{text-decoration:underline}
+main{max-width:980px;margin:0 auto;padding:20px}
+section{margin:0 0 36px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.stats b{display:block;font:700 1.8rem system-ui}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.85rem;color:var(--muted)}
+.tag{padding:2px 8px;border-radius:99px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.Pass,.Fixed,.Closed{background:#dff3e6;color:var(--pass)}.Fail,.Open,.High{background:#fbe3e1;color:var(--fail)}
+.Medium{background:#fdecd2;color:var(--warn)}.Low,.NA{background:#e8eeed;color:var(--muted)}
+button{background:var(--teal);color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:600;cursor:pointer}
+@media(prefers-color-scheme:dark){button{color:#0f1b1b}}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+button.alt{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+input,select{width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--card);color:var(--ink)}
+.err{color:var(--fail);font-family:system-ui}.ok{color:var(--pass);font-family:system-ui}

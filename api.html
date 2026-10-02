@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Tests</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>API and integration checks</h1>
+<p>Each row sends a request to a free practice API (JSONPlaceholder), then checks the status code and the data that comes back.</p></header>
+<nav><a href="index.html">QA dashboard</a><a href="app.html?v=1.1">Mock bank app</a><a href="api.html">API tests</a></nav>
+<main>
+<section><button id="run" onclick="runAll()">Run all API tests</button>
+<p class="card">Base URL: <code>https://jsonplaceholder.typicode.com</code>. This API is a public practice service: no login, no cost. Think of it as a stand-in for a backend banking service.</p></section>
+<section><div class="wrap"><table><thead><tr><th>ID</th><th>Request</th><th>What we check</th><th>Status</th><th>Result</th></tr></thead><tbody id="out"></tbody></table></div></section>
+<section class="card"><h2>What this shows</h2>
+<p>Validating data exchange means checking three things: the status code is right (200 OK, 201 Created, 404 Not Found), the response has the fields we expect, and the values match what we sent. In a bank, the same checks would be run on balance, transfer and statement services.</p></section>
+</main>
+<script>
+const B='https://jsonplaceholder.typicode.com';
+const tests=[
+ {id:'API-01',m:'GET',p:'/users/1',check:'Status 200 and has an email field',run:(s,d)=>s===200&&!!d.email},
+ {id:'API-02',m:'GET',p:'/posts/1',check:'Status 200 and userId is 1',run:(s,d)=>s===200&&d.userId===1},
+ {id:'API-03',m:'GET',p:'/posts/99999',check:'Unknown record returns 404',run:(s)=>s===404},
+ {id:'API-04',m:'POST',p:'/posts',body:{title:'QA test',body:'hello',userId:1},check:'Status 201 and title echoed back',run:(s,d)=>s===201&&d.title==='QA test'},
+ {id:'API-05',m:'GET',p:'/posts?userId=1',check:'Status 200 and list is not empty',run:(s,d)=>s===200&&Array.isArray(d)&&d.length>0}
+];
+$=id=>document.getElementById(id);
+$('out').innerHTML=tests.map(t=>`<tr><td>${t.id}</td><td>${t.m} ${t.p}</td><td>${t.check}</td><td id="s${t.id}">-</td><td id="r${t.id}">Not run</td></tr>`).join('');
+async function runAll(){ $('run').disabled=true;
+ for(const t of tests){ const r=$('r'+t.id), s=$('s'+t.id); r.textContent='Running...';
+  try{ const res=await fetch(B+t.p,{method:t.m,headers:{'Content-Type':'application/json'},body:t.body?JSON.stringify(t.body):undefined});
+   let d={}; try{d=await res.json();}catch(e){}
+   s.textContent=res.status; const ok=t.run(res.status,d);
+   r.innerHTML=`<span class="tag ${ok?'Pass':'Fail'}">${ok?'Pass':'Fail'}</span>`;
+  }catch(e){ s.textContent='No response'; r.innerHTML='<span class="tag Fail">Fail</span> Could not reach the API. Check internet.'; } }
+ $('run').disabled=false; }
+</script></body></html>
