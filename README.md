@@ -2,7 +2,6 @@
 
 A small portfolio project showing how I test digital banking channels.
 
-**Live site:** https://YOUR-USERNAME.github.io/qa-case-study/
 
 ## What is in it
 - `index.html`: QA dashboard with test cases, defect log, device matrix, regression scope, release sign-off and improvement ideas
