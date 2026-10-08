@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integration Testing</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Integration testing: mobile channel to backend service</h1>
+<p>When a customer taps Send, the app sends a request to a backend service and acts on the reply. These tests check that both sides agree on what happened.</p></header>
+<nav><a href="index.html">QA dashboard</a><a href="plan.html">Test plan</a><a href="app.html?v=1.0">App v1.0</a><a href="app.html?v=1.1">App v1.1</a><a href="api.html">API tests</a></nav>
+<main>
+
+<section><h2>What is integrated</h2>
+<div class="card"><p><b>Mobile app</b> (app.html) sends <b>POST /posts</b> to the <b>backend service</b> (JSONPlaceholder practice API), which replies with a status code and the data it received.</p>
+<p>The app creates a reference such as TXN-123456 and sends it with the recipient and amount. A correct integration means the reply echoes the same reference and data, and the app's screen, balance and history match the reply.</p>
+<p><b>Limit:</b> the practice API does not store data, so I validate the echoed data, not a database record. To trigger failures, open the app, go to Send money and use the "Backend condition" dropdown. The "Backend record" box under the button shows exactly what was sent and received.</p></div></section>
+
+<section><h2>Transaction outcome matrix</h2>
+<p>Results below are an example. Run each scenario yourself on both versions and correct any result that differs.</p>
+<div class="wrap"><table><thead><tr><th>ID</th><th>Scenario</th><th>Expected in app</th><th>Expected on backend side</th><th>v1.0</th><th>v1.1</th><th>Defect</th></tr></thead><tbody id="mx"></tbody></table></div></section>
+
+<section><h2>Integration defects</h2>
+<div class="wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Steps to reproduce</th><th>Actual vs expected</th><th>Severity</th><th>Status</th></tr></thead><tbody id="df"></tbody></table></div></section>
+
+<section><h2>Sample failure investigation: DEF-07</h2>
+<div class="card"><p><b>Report:</b> a customer taps Send, sees "Something went wrong", and later notices the money has left their balance.</p>
+<ol>
+<li><b>Reproduce:</b> open app v1.0, set the condition to "No response", send KES 1,000. The balance drops and the message is vague.</li>
+<li><b>Capture evidence:</b> the Backend record box shows a request but no response. In the browser, press F12, open the Network tab and repeat to see the same request with no reply. Screenshot both.</li>
+<li><b>Find the layer:</b> the screen showed an error (screen layer fine), the backend gave no reply (backend or network layer), and the app deducted money without a confirmed reply (app logic layer). The defect is in the app logic.</li>
+<li><b>Compare the data:</b> the request had a reference and amount, but no reply came, so the app should not treat the transfer as done.</li>
+<li><b>Escalate with:</b> reference, time, steps, screenshots, expected behaviour (mark as pending, do not debit, show the reference) and severity High, since customer money is affected.</li>
+<li><b>Verify the fix:</b> in v1.1 the balance is unchanged, history shows "Transfer (pending)" with the reference, and the message tells the customer not to retry.</li>
+</ol></div></section>
+
+<section><h2>Not covered</h2>
+<div class="card"><p>Double-tapping Send, real reversals, and checking a real backend database. These need a real system, so I list them as future work.</p></div></section>
+</main>
+<script>
+const tag=v=>`<span class="tag ${v}">${v}</span>`;
+const mx=[
+['INT-01','Normal transfer, backend replies OK','Success message with reference. Balance reduced. History updated','Status 200 or 201. Same reference and amount returned','Pass','Pass',''],
+['INT-02','Backend receives amount as a number','n/a','Amount sent as number, e.g. 1000, not "1,000"','Fail','Pass','DEF-06'],
+['INT-03','Backend returns server error 500','Clear failure message. Balance unchanged','No transaction created','Fail','Pass','DEF-05'],
+['INT-04','No response from backend','Pending status with reference. Balance unchanged','Outcome unknown, reference available to look up','Fail','Pass','DEF-07'],
+['INT-05','Slow response, times out after 4s','Same as no response','Same as no response','Fail','Pass','DEF-07'],
+['INT-06','Insufficient funds','Clear message with balance. No backend call','No request sent','Pass','Pass','']];
+const defects=[
+['DEF-05','Success shown when backend returns 500','1. Condition: Server error 500 2. Send 1,000','Shows "Sent", balance debited. Expected: failure message, no debit','High','Closed'],
+['DEF-06','Amount sent to backend as text','1. Send 1,000 2. Read Backend record','"1,000" with comma. Expected: number 1000','Medium','Closed'],
+['DEF-07','Balance debited on timeout, no reference shown','1. Condition: No response 2. Send 1,000','Debited with "Something went wrong". Expected: pending, no debit, reference shown','High','Closed']];
+const rows=(a,t)=>a.map(r=>'<tr>'+r.map((c,j)=>`<td>${t.includes(j)&&c?tag(c):c}</td>`).join('')+'</tr>').join('');
+document.getElementById('mx').innerHTML=rows(mx,[4,5]);
+document.getElementById('df').innerHTML=rows(defects,[4,5]);
+</script></body></html>

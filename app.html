@@ -6,7 +6,7 @@
 <body>
 <header><h1>Mock Mobile Bank</h1>
 <p>Demo app built only for testing. No real money or real bank. Version: <b id="ver"></b></p></header>
-<nav><a href="index.html">QA dashboard</a><a href="app.html?v=1.0">Open v1.0 (has bugs)</a><a href="app.html?v=1.1">Open v1.1 (fixed)</a><a href="api.html">API tests</a></nav>
+<nav><a href="index.html">QA dashboard</a><a href="app.html?v=1.0">Open v1.0 (has bugs)</a><a href="app.html?v=1.1">Open v1.1 (fixed)</a><a href="integration.html">Integration</a><a href="api.html">API tests</a></nav>
 <main style="max-width:480px">
 
 <section id="login" class="card"><h2>Log in</h2>
@@ -22,8 +22,11 @@
 <section id="send" class="card" hidden><h2>Send money</h2>
 <label for="to">Recipient phone</label><input id="to" inputmode="tel">
 <label for="amt">Amount (KES)</label><input id="amt" inputmode="decimal">
-<button onclick="send()">Send</button> <button class="alt" onclick="show('home')">Back</button>
-<p id="sendMsg"></p></section>
+<label for="mode">Backend condition (tester tool)</label>
+<select id="mode"><option value="ok">Normal (real API call)</option><option value="500">Server error 500</option><option value="none">No response</option><option value="slow">Slow, times out after 4s</option></select>
+<button id="sendBtn" onclick="send()">Send</button> <button class="alt" onclick="show('home')">Back</button>
+<p id="sendMsg"></p>
+<h3>Backend record (what was sent and received)</h3><pre id="net" style="white-space:pre-wrap;font-size:.8rem">No request yet.</pre></section>
 
 <section id="air" class="card" hidden><h2>Buy airtime</h2>
 <label for="net">Network</label><select id="net"><option>Network A</option><option>Network B</option></select>
@@ -48,12 +51,34 @@ function render(){ $('bal').textContent = 'KES ' + balance.toLocaleString();
   const list = FIXED ? [...tx].reverse() : tx;           // DEF-04: v1.0 shows oldest first
   $('rows').innerHTML = list.length ? list.map(t=>`<tr><td>${t.type}</td><td>${t.d}</td><td>${t.a}</td></tr>`).join('') : '<tr><td colspan="3">No transactions yet.</td></tr>'; }
 function login(){ if($('pin').value==='1234'){ $('login').hidden=true; show('home'); } else $('loginMsg').textContent='Incorrect PIN. Try again.'; }
-function send(){ const a = parseFloat($('amt').value), m = $('sendMsg'); m.className='err';
-  if(!$('to').value){ m.textContent='Enter a recipient phone number.'; return; }
+function callBackend(p,mode){            // the "backend service" the app talks to
+  if(mode==='500') return Promise.resolve({status:500,data:{}});
+  if(mode==='none') return Promise.reject(new Error('no response'));
+  if(mode==='slow') return new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),4000));
+  return fetch('https://jsonplaceholder.typicode.com/posts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)})
+    .then(async r=>({status:r.status,data:await r.json()}));
+}
+async function send(){ const a=parseFloat($('amt').value), m=$('sendMsg'), to=$('to').value; m.className='err';
+  if(!to){ m.textContent='Enter a recipient phone number.'; return; }
   if(isNaN(a)){ m.textContent='Enter a valid amount.'; return; }
-  if(FIXED && a<=0){ m.textContent='Amount must be greater than zero.'; return; } // DEF-01: v1.0 accepts negatives
+  if(FIXED && a<=0){ m.textContent='Amount must be greater than zero.'; return; } // DEF-01
   if(a>balance){ m.textContent = FIXED ? 'Insufficient funds. Your balance is KES '+balance+'.' : 'Error 5003'; return; } // DEF-03
-  balance -= a; tx.push({type:'Transfer',d:$('to').value,a:-a}); m.className='ok'; m.textContent='Sent KES '+a+'.'; render(); }
+  const ref='TXN-'+Date.now().toString().slice(-6);
+  const p={title:ref,body:JSON.stringify({to:to,amount:FIXED?a:a.toLocaleString()}),userId:1}; // DEF-06: v1.0 sends amount as text like "1,000"
+  m.className=''; m.textContent='Sending...'; $('sendBtn').disabled=true; let res=null;
+  try{ res=await callBackend(p,$('mode').value); }catch(e){ res=null; }
+  $('sendBtn').disabled=false;
+  $('net').textContent='REQUEST  POST /posts\n'+JSON.stringify(p,null,1)+'\n\nRESPONSE '+(res?res.status+'\n'+JSON.stringify(res.data,null,1):'none (no response or timeout)');
+  if(res===null){                                           // DEF-07
+    if(FIXED){ tx.push({type:'Transfer (pending)',d:to+' '+ref,a:0}); m.textContent='We could not confirm your transfer. Do not retry yet. Check history. Ref: '+ref; }
+    else { balance-=a; m.textContent='Something went wrong.'; }
+    render(); return; }
+  if(res.status>=400){                                       // DEF-05
+    if(FIXED){ m.textContent='Transfer failed. No money was taken. Ref: '+ref; }
+    else { balance-=a; tx.push({type:'Transfer',d:to,a:-a}); m.className='ok'; m.textContent='Sent KES '+a+'.'; }
+    render(); return; }
+  balance-=a; tx.push({type:'Transfer',d:to+' '+ref,a:-a}); m.className='ok';
+  m.textContent='Sent KES '+a+'. Ref: '+ref+(res.data.title===ref?'':' (WARNING: backend returned a different reference)'); render(); }
 function airtime(){ const a = parseFloat($('aamt').value), m = $('airMsg'); m.className='err';
   if(isNaN(a) || a<=0){ m.textContent='Enter a valid amount.'; return; }
   if(a>balance){ m.textContent='Insufficient funds.'; return; }

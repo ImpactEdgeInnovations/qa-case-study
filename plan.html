@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Plan</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Test plan: Mock Mobile Bank v1.0 and v1.1</h1>
+<p>A test plan says what we will test, how, and when we can stop. This one is short on purpose.</p></header>
+<nav><a href="index.html">QA dashboard</a><a href="plan.html">Test plan</a><a href="app.html?v=1.0">App v1.0</a><a href="app.html?v=1.1">App v1.1</a><a href="integration.html">Integration</a><a href="api.html">API tests</a></nav>
+<main>
+
+<section><h2>Objective</h2>
+<div class="card"><p>Check that the customer journeys in the mock mobile banking app work correctly, that errors are handled clearly, and that the app is safe to release. Check that data returned by an API matches what is expected.</p></div></section>
+
+<section><h2>Scope</h2>
+<div class="wrap"><table><thead><tr><th>In scope</th><th>Out of scope</th></tr></thead><tbody>
+<tr><td>Login with correct and wrong PIN</td><td>Performance and load testing</td></tr>
+<tr><td>Send money, including invalid amounts</td><td>Security and penetration testing</td></tr>
+<tr><td>Buy airtime and balance update</td><td>Automated test scripts</td></tr>
+<tr><td>Transaction history</td><td>Real backend, real money, real mobile networks</td></tr>
+<tr><td>Layout on phone, tablet and laptop browsers</td><td>USSD channel (not built in this project)</td></tr>
+<tr><td>5 API checks, plus integration of Send money with a backend service, including failure cases</td><td>Accessibility audit</td></tr>
+</tbody></table></div></section>
+
+<section><h2>Approach</h2>
+<div class="card"><ul>
+<li><b>Functional testing:</b> manual tests for normal use, error cases and navigation.</li>
+<li><b>Compatibility testing:</b> the same journeys on different devices, operating systems and browsers.</li>
+<li><b>API testing:</b> requests sent to a practice API, checking status code, response fields and values.</li>
+<li><b>Defect retest:</b> every fixed defect is checked again on v1.1.</li>
+<li><b>Regression testing:</b> all test cases re-run on v1.1, because the fixes touched balance and transfer logic that every journey uses.</li>
+</ul></div></section>
+
+<section><h2>Test environment and data</h2>
+<div class="wrap"><table><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody>
+<tr><td>Application</td><td>app.html, version 1.0 and version 1.1 (switch with ?v=)</td></tr>
+<tr><td>Hosting</td><td>GitHub Pages, public link</td></tr>
+<tr><td>API</td><td>JSONPlaceholder, a free public practice API</td></tr>
+<tr><td>Test data</td><td>PIN 1234 (valid) and 0000 (invalid); opening balance KES 50,000; amounts 1000, -500, 99999</td></tr>
+<tr><td>Tools</td><td>Browsers, browser developer tools, Postman (optional)</td></tr>
+</tbody></table></div></section>
+
+<section><h2>Entry and exit criteria</h2>
+<div class="wrap"><table><thead><tr><th>Start testing when</th><th>Stop and release when</th></tr></thead><tbody>
+<tr><td>The app version is available and opens</td><td>All planned test cases are run</td></tr>
+<tr><td>Test cases and test data are ready</td><td>No open critical or high defects</td></tr>
+<tr><td>Devices and browsers are available</td><td>All fixed defects are retested and closed</td></tr>
+<tr><td></td><td>Sign-off is written, with residual risk stated</td></tr>
+</tbody></table></div></section>
+
+<section><h2>Defect handling</h2>
+<div class="card"><p>Each defect is logged with an ID, title, steps to reproduce, actual and expected result, severity and priority. Severity is the impact on the customer or the bank. Priority is how soon it must be fixed. Defects move from Open to Fixed to Closed once retested.</p></div></section>
+
+<section><h2>Risks</h2>
+<div class="wrap"><table><thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead><tbody>
+<tr><td>Only a few devices available</td><td>Some device problems may be missed</td><td>State the tested devices clearly in the matrix</td></tr>
+<tr><td>Public API can change or be slow</td><td>API tests may fail for reasons outside the app</td><td>Re-run before judging a failure</td></tr>
+<tr><td>Demo app has no real backend</td><td>Integration failures cannot be tested end to end</td><td>State this limit in the sign-off</td></tr>
+</tbody></table></div></section>
+
+<section><h2>Deliverables</h2>
+<div class="card"><p>Test cases and results, defect log, device matrix, API results, regression results, release sign-off and quality improvement notes. All are on the <a href="index.html">QA dashboard</a>.</p></div></section>
+</main></body></html>

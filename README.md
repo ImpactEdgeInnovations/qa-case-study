@@ -7,6 +7,8 @@ A small portfolio project showing how I test digital banking channels.
 ## What is in it
 - `index.html`: QA dashboard with test cases, defect log, device matrix, regression scope, release sign-off and improvement ideas
 - `app.html`: demo mobile banking app (the application under test). `?v=1.0` has 4 planted defects, `?v=1.1` has them fixed
+- `plan.html`: test plan with scope, approach, environment, entry/exit criteria and risks
+- `integration.html`: integration tests between the app and a backend service, outcome matrix, failure investigation report
 - `api.html`: 5 API checks against the free JSONPlaceholder practice API
 - `style.css`: shared styling
 
