@@ -5,9 +5,13 @@
 <link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>QA case study: testing a mobile banking channel</h1>
-<p>I tested a demo mobile banking web app and a public API, logged the defects, re-tested the fixes and wrote a release sign-off. Replace this line with your name and a one-line summary.</p></header>
+<p>By [Your name]. I tested a small demo banking app and a public API, logged what broke, retested the fixes and wrote a release sign-off.</p></header>
 <nav><a href="plan.html">Test plan</a><a href="#cases">Test cases</a><a href="#defects">Defects</a><a href="#compat">Devices</a><a href="#regression">Regression</a><a href="#signoff">Sign-off</a><a href="#improve">Improvements</a><a href="app.html?v=1.0">App v1.0</a><a href="app.html?v=1.1">App v1.1</a><a href="integration.html">Integration</a><a href="api.html">API tests</a></nav>
 <main>
+<section class="card"><h2>The short version</h2>
+<p><b>What:</b> a demo mobile banking app with 7 deliberate defects, in two versions (v1.0 broken, v1.1 fixed).</p>
+<p><b>What I did:</b> wrote test cases, ran them on v1.0, logged each defect, retested on v1.1, checked the API calls behind Send money and wrote a sign-off.</p>
+<p><b>Where to look:</b> test cases and defects below, <a href="integration.html">integration</a> for the backend checks, <a href="plan.html">test plan</a> for scope.</p></section>
 <section><div class="stats card" id="stats"></div></section>
 
 <section id="cases"><h2>Test cases (functional, error and navigation)</h2>
@@ -27,17 +31,16 @@
 <p><b>API suite:</b> 5 checks on <a href="api.html">the API page</a>: status codes, required fields, a not-found case and a create (POST) case.</p></div></section>
 
 <section id="signoff"><h2>Release sign-off: v1.1</h2>
-<div class="card"><p><b>Recommendation: Approved for release.</b></p>
-<p>All 4 defects are fixed and verified. 9 of 9 test cases pass on v1.1. No open critical or high defects. Evidence: this dashboard, defect log and screenshots in the <code>evidence</code> folder.</p>
-<p>Integration results (INT-01 to INT-06, DEF-05 to DEF-07) are on the <a href="integration.html">Integration page</a>. All three integration defects are also fixed and verified in v1.1.</p>
-<p>Residual risk: the app is a demo with no real backend, so performance, security and real device-network behaviour are not covered.</p></div></section>
+<div class="card"><p><b>OK to release v1.1.</b></p>
+<p>All 7 defects (4 in the app, 3 in the backend calls) were fixed and retested. All 9 test cases pass. Nothing high or critical is still open. The backend results are on the <a href="integration.html">integration page</a>.</p>
+<p><b>Not covered:</b> performance, security and real phone networks. This is a demo with no real backend.</p></div></section>
 
-<section id="improve"><h2>Quality improvement</h2>
+<section id="improve"><h2>What I would improve next</h2>
 <div class="card"><ul>
-<li><b>Pattern:</b> 2 of 4 defects were calculation or balance errors. Add a calculation check to every money-moving test case.</li>
-<li><b>Pattern:</b> error messages were unclear. Add an error-message review to the test checklist.</li>
-<li><b>Coverage gap:</b> no tests for session timeout, duplicate submissions or slow networks. Add these next.</li>
-<li><b>Automation idea:</b> the regression suite is repeatable, so it is a good candidate for automation (for example Playwright).</li>
+<li>4 of the 7 defects ended with the wrong balance. Every test that moves money should also check the balance afterwards.</li>
+<li>2 defects gave the customer a poor message (DEF-03, DEF-07). Add a check on error wording to the test checklist.</li>
+<li>Not tested yet: session timeout, tapping Send twice, and slow networks.</li>
+<li>The regression tests repeat every release, so they are a good fit for automation later (for example Playwright).</li>
 </ul></div></section>
 </main>
 <script>
