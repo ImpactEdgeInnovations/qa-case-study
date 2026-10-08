@@ -26,7 +26,7 @@
 <select id="mode"><option value="ok">Normal (real API call)</option><option value="500">Server error 500</option><option value="none">No response</option><option value="slow">Slow, times out after 4s</option></select>
 <button id="sendBtn" onclick="send()">Send</button> <button class="alt" onclick="show('home')">Back</button>
 <p id="sendMsg"></p>
-<h3>Backend record (what was sent and received)</h3><pre id="net" style="white-space:pre-wrap;font-size:.8rem">No request yet.</pre></section>
+<h3>Backend record (what was sent and received)</h3><pre id="netlog" style="white-space:pre-wrap;font-size:.8rem">No request yet.</pre></section>
 
 <section id="air" class="card" hidden><h2>Buy airtime</h2>
 <label for="net">Network</label><select id="net"><option>Network A</option><option>Network B</option></select>
@@ -68,7 +68,7 @@ async function send(){ const a=parseFloat($('amt').value), m=$('sendMsg'), to=$(
   m.className=''; m.textContent='Sending...'; $('sendBtn').disabled=true; let res=null;
   try{ res=await callBackend(p,$('mode').value); }catch(e){ res=null; }
   $('sendBtn').disabled=false;
-  $('net').textContent='REQUEST  POST /posts\n'+JSON.stringify(p,null,1)+'\n\nRESPONSE '+(res?res.status+'\n'+JSON.stringify(res.data,null,1):'none (no response or timeout)');
+  $('netlog').textContent='REQUEST  POST /posts\n'+JSON.stringify(p,null,1)+'\n\nRESPONSE '+(res?res.status+'\n'+JSON.stringify(res.data,null,1):'none (no response or timeout)');
   if(res===null){                                           // DEF-07
     if(FIXED){ tx.push({type:'Transfer (pending)',d:to+' '+ref,a:0}); m.textContent='We could not confirm your transfer. Do not retry yet. Check history. Ref: '+ref; }
     else { balance-=a; m.textContent='Something went wrong.'; }
