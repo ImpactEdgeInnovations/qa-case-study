@@ -25,18 +25,18 @@
 <div class="card"><ul>
 <li><b>Functional testing:</b> manual tests for normal use, error cases and navigation.</li>
 <li><b>Compatibility testing:</b> the same journeys on different devices, operating systems and browsers.</li>
-<li><b>API testing:</b> requests sent to a practice API, checking status code, response fields and values.</li>
+<li><b>Backend checks:</b> messages sent to a practice service, checking the reply code, the details returned and the values.</li>
 <li><b>Defect retest:</b> every fixed defect is checked again on v1.1.</li>
 <li><b>Regression testing:</b> all test cases re-run on v1.1, because the fixes touched balance and transfer logic that every journey uses.</li>
 </ul></div></section>
 
 <section><h2>Test environment and data</h2>
 <div class="wrap"><table><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody>
-<tr><td>Application</td><td>app.html, version 1.0 and version 1.1 (switch with ?v=)</td></tr>
-<tr><td>Hosting</td><td>GitHub Pages, public link</td></tr>
-<tr><td>API</td><td>JSONPlaceholder, a free public practice API</td></tr>
+<tr><td>Application</td><td>app.html, version 1.0 and version 1.1 (add ?v=1.0 or ?v=1.1 to the link)</td></tr>
+<tr><td>Hosting</td><td>GitHub (free), public link</td></tr>
+<tr><td>API</td><td>A free public practice service</td></tr>
 <tr><td>Test data</td><td>PIN 1234 (valid) and 0000 (invalid); opening balance KES 50,000; amounts 1000, -500, 99999</td></tr>
-<tr><td>Tools</td><td>Browsers, browser developer tools, Postman (optional)</td></tr>
+<tr><td>Tools</td><td>Web browsers on different devices</td></tr>
 </tbody></table></div></section>
 
 <section><h2>Entry and exit criteria</h2>
@@ -53,7 +53,7 @@
 <section><h2>Risks</h2>
 <div class="wrap"><table><thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead><tbody>
 <tr><td>Only a few devices available</td><td>Some device problems may be missed</td><td>State the tested devices clearly in the matrix</td></tr>
-<tr><td>Public API can change or be slow</td><td>API tests may fail for reasons outside the app</td><td>Re-run before judging a failure</td></tr>
+<tr><td>The free practice service can be slow or change</td><td>These checks may fail for reasons outside the app</td><td>Re-run before judging a failure</td></tr>
 <tr><td>Demo app has no real backend</td><td>Integration failures cannot be tested end to end</td><td>State this limit in the sign-off</td></tr>
 </tbody></table></div></section>
 

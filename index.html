@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>QA case study: testing a mobile banking channel</h1>
-<p>By Sharleen Njihia. I tested a small demo banking app and a public API, logged what broke, retested the fixes and wrote a release sign-off.</p></header>
+<p>By [Your name]. I tested a small demo banking app and a public API, logged what broke, retested the fixes and wrote a release sign-off.</p></header>
 <nav><a href="plan.html">Test plan</a><a href="#cases">Test cases</a><a href="#defects">Defects</a><a href="#compat">Devices</a><a href="#regression">Regression</a><a href="#signoff">Sign-off</a><a href="#improve">Improvements</a><a href="app.html?v=1.0">App v1.0</a><a href="app.html?v=1.1">App v1.1</a><a href="integration.html">Integration</a><a href="api.html">API tests</a></nav>
 <main>
 <section class="card"><h2>The short version</h2>
@@ -40,7 +40,7 @@
 <li>4 of the 7 defects ended with the wrong balance. Every test that moves money should also check the balance afterwards.</li>
 <li>2 defects gave the customer a poor message (DEF-03, DEF-07). Add a check on error wording to the test checklist.</li>
 <li>Not tested yet: session timeout, tapping Send twice, and slow networks.</li>
-<li>The regression tests repeat every release, so they are a good fit for automation later (for example Playwright).</li>
+<li>The regression tests repeat every release, so they could be automated later.</li>
 </ul></div></section>
 </main>
 <script>
